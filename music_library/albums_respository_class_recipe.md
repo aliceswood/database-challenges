@@ -121,13 +121,41 @@ class AlbumRepository
     # Returns an array of Album objects.
   end
 
+  # Returns one record
+  # Takes the album id as an argument
   def find(id)
     # Executes the SQL query:
     # SELECT id, title, release_year, artist_id FROM albums WHERE id = $1;
 
     # returns a single artist object
   end
-end
+
+  # creates a new album
+  # Takes an Album object as an argument
+  def create(album)
+    # Executes the SQL query:
+    # INSERT INTO albums (title, release_year, artist_id) VALUES ($1, $2, $3);
+
+    # returns nil (only creates the record)
+  end
+
+  # Deletes an album
+  # Based on the album id
+  def delete(id)
+    # Executes the SQL query:
+    # DELETE FROM albums WHERE id = $1;
+
+    #returns nil (only deletes the record)
+  end
+
+  # Updates album details
+  # Takes an album object (with the new details) as an arg
+  def update(album)
+    # Executes the SQL query:
+    # UPDATE albums SET title = $1, release_year = $2, artist_id = $3 WHERE id = $4;
+
+    # returns nil (only updates the album details)
+  end
 end
 ```
 
@@ -159,9 +187,87 @@ repo = AlbumRepository.new
 
 albums = repo.find(3)
 
-albums.title # => 'Super Trooper'
+albums.title # => 'Super Trouper'
 albums.release_year # => '1972'
-albums.artist_id # => 1
+albums.artist_id # => 2
+
+# 3 
+# Creates a new album
+
+repo = AlbumRepository.new
+
+album = Album.new
+album.name = 'Voulez Vous'
+album.release_year = '1989'
+album.artist_id = '2'
+
+repo.create(album) # => nil
+
+albums = repo.all
+
+last_album = album.last
+last_album.name # => 'Voulez Vous'
+last_album.release_year # => '1979'
+last_album.artist_id # => '2'
+
+# 4 
+# it deletes an album
+
+repo = AlbumRepository.new
+
+id_to_delete = 1
+
+repo.delete(id_to_delete) # => returns nil
+
+all_albums = repo.all
+all_albums.length # => 1
+all_allbums.first.id # => '2'
+
+# 5 
+# it deletes all albums
+
+repo = AlbumRepository.new
+
+repo.delete(1) # => returns nil
+repo.delete(2) # => returns nil
+
+all_albums = repo.all
+all_albums.length # => 0
+
+# 6 
+# it updates the album details
+
+repo = AlbumRepository.new
+
+album = repo.find(1)
+album.title = 'Something else'
+album.release_year = '1900'
+album.artist_id = '2'
+
+repo.update(album)
+
+updated_album = repo.find(1)
+
+updated_album.title # => 'Something else'
+updated_album.release_year # => '1900'
+updated_album.artist_id # => '2'
+
+# 7 
+# it updates some of the album details
+
+repo = AlbumRepository.new
+
+album = repo.find(1)
+album.release_year = '1900'
+album.artist_id = '2'
+
+repo.update(album)
+
+updated_album = repo.find(1)
+
+updated_album.title # => 'Doolittle'
+updated_album.release_year # => '1900'
+updated_album.artist_id # => '2'
 
 ```
 
@@ -178,15 +284,15 @@ This is so you get a fresh table contents every time you run the test suite.
 
 # file: spec/album_repository_spec.rb
 
-def reset_students_table
-  seed_sql = File.read('spec/seeds_students.sql')
-  connection = PG.connect({ host: '127.0.0.1', dbname: 'students' })
+def reset_albums_table
+  seed_sql = File.read('spec/seeds_albums.sql')
+  connection = PG.connect({ host: '127.0.0.1', dbname: 'music_library_test' })
   connection.exec(seed_sql)
 end
 
-describe StudentRepository do
+describe AlbumsRepository do
   before(:each) do 
-    reset_students_table
+    reset_albums_table
   end
 
   # (your tests will go here).
